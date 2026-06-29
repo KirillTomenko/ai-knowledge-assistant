@@ -1,0 +1,9 @@
+# Тестовые зависимости — устанавливать поверх requirements/api.txt
+pytest==8.3.4
+pytest-asyncio==0.24.0
+pytest-mock==3.14.0
+pytest-cov==6.0.0
+httpx==0.28.0          # для TestClient FastAPI
+respx==0.21.1          # mock httpx-запросов (OpenAI, Supabase)
+factory-boy==3.3.1     # фабрики тестовых данных
+freezegun==1.5.1       # фиксация времени в тестах

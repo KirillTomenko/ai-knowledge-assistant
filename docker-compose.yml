@@ -1,0 +1,74 @@
+version: "3.9"
+
+services:
+  # ────────────────────────────────────────────────
+  # ChromaDB — векторное хранилище
+  # ────────────────────────────────────────────────
+  chromadb:
+    image: chromadb/chroma:latest
+    container_name: aka_chromadb
+    restart: unless-stopped
+    ports:
+      - "8001:8000"
+    volumes:
+      - chroma_data:/chroma/chroma
+    environment:
+      - CHROMA_SERVER_AUTH_CREDENTIALS_FILE=/chroma/auth/credentials
+      - ALLOW_RESET=true
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/heartbeat"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ────────────────────────────────────────────────
+  # FastAPI — Admin Panel + RAG API
+  # ────────────────────────────────────────────────
+  api:
+    build:
+      context: .
+      dockerfile: docker/api.Dockerfile
+    container_name: aka_api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./uploads:/app/uploads
+      - ./logs:/app/logs
+    env_file:
+      - .env
+    environment:
+      - CHROMA_HOST=chromadb
+      - CHROMA_PORT=8000
+    depends_on:
+      chromadb:
+        condition: service_healthy
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  # ────────────────────────────────────────────────
+  # aiogram Telegram Bot
+  # ────────────────────────────────────────────────
+  bot:
+    build:
+      context: .
+      dockerfile: docker/bot.Dockerfile
+    container_name: aka_bot
+    restart: unless-stopped
+    volumes:
+      - ./logs:/app/logs
+    env_file:
+      - .env
+    environment:
+      - API_BASE_URL=http://api:8000
+      - CHROMA_HOST=chromadb
+      - CHROMA_PORT=8000
+    depends_on:
+      - api
+      - chromadb
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+volumes:
+  chroma_data:
+    driver: local
