@@ -1,8 +1,5 @@
 # 🤖 AI Knowledge Assistant
 
-<p align="center">
-  <img src="docs/assets/banner.png" alt="AI Knowledge Assistant" width="800"/>
-</p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Python-3.12-blue?logo=python&logoColor=white"/>
