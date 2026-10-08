@@ -12,7 +12,7 @@ Supabase Python SDK v2 поддерживает AsyncClient из коробки.
 from __future__ import annotations
 
 from supabase import create_client, Client
-from supabase._async.client import AsyncClient, create_async_client
+from supabase import AsyncClient, create_async_client
 from loguru import logger
 
 from src.core.config import settings

@@ -15,8 +15,6 @@ COPY requirements/api.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY src/ ./src/
-COPY alembic/ ./alembic/
-COPY alembic.ini ./
 
 RUN mkdir -p /app/uploads /app/logs
 

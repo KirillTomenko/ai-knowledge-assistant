@@ -37,23 +37,18 @@ def make_msg(role: str, content: str, idx: int = 1) -> dict:
 
 
 @pytest.fixture
-def repo_with_mock(mock_supabase_client):
+def repo_with_mock(mock_supabase_client, monkeypatch):
     from src.db.repositories.history import HistoryRepository
 
     client, builder, mock_result = mock_supabase_client
     repo = HistoryRepository()
 
-    # Патчим get_async_supabase внутри модуля history
-    import src.db.repositories.history as history_module
-    original = history_module.__dict__.get("get_async_supabase")
-
     async def fake_get_client():
         return client
 
-    history_module.get_async_supabase = fake_get_client
+    # Patch where BaseRepository resolves the imported function; restore after the test.
+    monkeypatch.setattr("src.db.repositories.base.get_async_supabase", fake_get_client)
     yield repo, builder, mock_result
-    if original:
-        history_module.get_async_supabase = original
 
 
 # ══════════════════════════════════════════════════════════════

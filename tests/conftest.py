@@ -26,14 +26,15 @@ from httpx import ASGITransport, AsyncClient
 
 # ── Фиктивные переменные окружения ───────────────────────────
 
-@pytest.fixture(autouse=True, scope="session")
-def mock_env(monkeypatch=None):
+def pytest_configure(config):
     """
     Подставляет фиктивные переменные окружения для Settings().
-    autouse=True — применяется ко всем тестам автоматически.
+    Настройки задаются до импорта модулей приложения при сборе тестов.
     """
-    import os
+    config._test_env = pytest.MonkeyPatch()
     env_vars = {
+        "HTTP_PROXY": "",
+        "HTTPS_PROXY": "",
         "OPENAI_API_KEY": "sk-test-key-000",
         "OPENAI_BASE_URL": "https://api.proxyapi.ru/openai/v1",
         "TELEGRAM_BOT_TOKEN": "123456789:AABBCCDDEEFFaabbccddeeff-test",
@@ -47,7 +48,12 @@ def mock_env(monkeypatch=None):
         "API_SECRET_KEY": "test-secret-key-32-chars-minimum!",
     }
     for k, v in env_vars.items():
-        os.environ.setdefault(k, v)
+        config._test_env.setenv(k, v)
+
+
+def pytest_unconfigure(config):
+    if hasattr(config, "_test_env"):
+        config._test_env.undo()
 
 
 # ── Общие тестовые данные ─────────────────────────────────────

@@ -37,18 +37,17 @@ def make_note(idx: int = 1, user_id: int = 111222333, **kwargs) -> dict:
 
 
 @pytest.fixture
-def repo_with_mock(mock_supabase_client):
+def repo_with_mock(mock_supabase_client, monkeypatch):
     from src.db.repositories.notes import NotesRepository
 
     client, builder, mock_result = mock_supabase_client
     repo = NotesRepository()
 
-    import src.db.repositories.notes as notes_module
-
     async def fake_get_client():
         return client
 
-    notes_module.get_async_supabase = fake_get_client
+    # Patch where BaseRepository resolves the imported function; restore after the test.
+    monkeypatch.setattr("src.db.repositories.base.get_async_supabase", fake_get_client)
     yield repo, builder, mock_result
 
 

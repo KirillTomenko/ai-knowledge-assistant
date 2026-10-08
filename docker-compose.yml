@@ -1,22 +1,21 @@
-version: "3.9"
-
 services:
   # ────────────────────────────────────────────────
   # ChromaDB — векторное хранилище
   # ────────────────────────────────────────────────
   chromadb:
-    image: chromadb/chroma:latest
+    image: chromadb/chroma:0.5.20
     container_name: aka_chromadb
     restart: unless-stopped
     ports:
-      - "8001:8000"
+      - "127.0.0.1:8001:8000"
     volumes:
       - chroma_data:/chroma/chroma
     environment:
-      - CHROMA_SERVER_AUTH_CREDENTIALS_FILE=/chroma/auth/credentials
+      - IS_PERSISTENT=TRUE
+      - ANONYMIZED_TELEMETRY=FALSE
       - ALLOW_RESET=true
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/heartbeat"]
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/heartbeat', timeout=3)"]
       interval: 10s
       timeout: 5s
       retries: 5

@@ -1,0 +1,56 @@
+{
+  "recorded_at": "2026-10-08T13:09:43.258022+00:00",
+  "mode": "live",
+  "status": "blocked_missing_settings",
+  "model": "gpt-4o",
+  "embedding_model": "text-embedding-3-small",
+  "collection": "demo_sever_2026",
+  "documents": [
+    {
+      "filename": "sever_it_support.txt",
+      "sha256": "f1f9496cd928f1505f7ff82f92d58143f457e7dd2bfcdf1bc51f59391dc8ed4d",
+      "chunks": 1,
+      "expected_passages_preserved": true
+    },
+    {
+      "filename": "sever_remote_work.txt",
+      "sha256": "f76b01182c295ff7947f80836424ba2d2a6e7e9cb36a4b3dfeb935ca19353641",
+      "chunks": 1,
+      "expected_passages_preserved": true
+    }
+  ],
+  "cases": [
+    {
+      "id": "direct",
+      "question": "Сколько дней в неделю можно работать удалённо и когда нужно согласовать дни?",
+      "status": "not_run_missing_settings",
+      "actual_answer": null,
+      "actual_sources": [],
+      "source_checks": []
+    },
+    {
+      "id": "paraphrase",
+      "question": "Хочу пару дней поработать из дома. До какого времени предупредить начальника?",
+      "status": "not_run_missing_settings",
+      "actual_answer": null,
+      "actual_sources": [],
+      "source_checks": []
+    },
+    {
+      "id": "unanswerable",
+      "question": "Какую сумму компания компенсирует за домашний интернет?",
+      "status": "not_run_missing_settings",
+      "actual_answer": null,
+      "actual_sources": [],
+      "source_checks": []
+    }
+  ],
+  "review": "Source checks only locate excerpts. A human must verify answer support and refusal.",
+  "missing_settings": [
+    "OPENAI_API_KEY",
+    "SUPABASE_URL",
+    "SUPABASE_KEY",
+    "ADMIN_PASSWORD"
+  ],
+  "api_openapi": 200
+}

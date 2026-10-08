@@ -105,7 +105,7 @@ async def upload_document(
     )
 
     # Ставим индексацию в фон
-    background_tasks.add_task(_run_indexing, doc_id, file_path)
+    background_tasks.add_task(_run_indexing, doc_id, file_path, file.filename)
     logger.info(f"[upload] Document queued: {doc_id} ({file.filename}, {file_size // 1024} KB)")
 
     return DocumentResponse.model_validate(doc.model_dump())
@@ -165,6 +165,7 @@ async def list_documents(
 @router.delete(
     "/{doc_id}",
     status_code=status.HTTP_204_NO_CONTENT,
+    response_model=None,
     summary="Удалить документ и его векторы",
 )
 async def delete_document(doc_id: str) -> None:
@@ -203,7 +204,9 @@ async def delete_document(doc_id: str) -> None:
 
 # ── Фоновая задача индексации ─────────────────────────────────
 
-async def _run_indexing(doc_id: str, file_path: Path) -> None:
+async def _run_indexing(
+    doc_id: str, file_path: Path, original_filename: str | None = None,
+) -> None:
     """
     Фоновая задача: парсинг → чанкинг → embeddings → ChromaDB.
 
@@ -219,6 +222,11 @@ async def _run_indexing(doc_id: str, file_path: Path) -> None:
         # ── Шаг 1: Парсинг и чанкинг ─────────────────────────
         logger.debug(f"[indexing:{doc_id}] Parsing file...")
         chunks = await document_parser.parse_file(file_path)
+        # The storage UUID must not replace the human-readable source name.
+        if original_filename:
+            source_name = Path(original_filename.replace("\\", "/")).name
+            for chunk in chunks:
+                chunk.metadata["source"] = source_name
         logger.info(f"[indexing:{doc_id}] Parsed: {len(chunks)} chunks")
 
         if not chunks:

@@ -53,7 +53,7 @@ def repo_with_mock(mock_supabase_client):
     client, builder, mock_result = mock_supabase_client
     repo = DocumentsRepository()
 
-    with patch("src.db.repositories.documents.get_async_supabase", AsyncMock(return_value=client)):
+    with patch("src.db.repositories.base.get_async_supabase", AsyncMock(return_value=client)):
         yield repo, builder, mock_result, client
 
 
@@ -69,7 +69,7 @@ class TestDocumentsRepositoryCreate:
         row_data = make_doc_row()
         mock_result.data = [row_data]
 
-        with patch("src.db.repositories.documents.get_async_supabase",
+        with patch("src.db.repositories.base.get_async_supabase",
                    AsyncMock(return_value=MagicMock(table=MagicMock(return_value=builder)))):
             result = await repo.create(
                 doc_id="doc-uuid-test",
